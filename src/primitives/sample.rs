@@ -1,5 +1,5 @@
-use super::scalars::string_scalar::StringScalar;
+use super::scalars::scalar::Scalar;
 
 pub struct Sample {
-  pub value: StringScalar,
+  pub value: Scalar,
 }

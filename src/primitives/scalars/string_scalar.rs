@@ -6,8 +6,8 @@ pub struct StringScalar {
   value: String,
 }
 
-impl scalar::Scalar<String> for StringScalar {
-  fn of(value: &String) -> Self {
+impl scalar::BaseScalar<String> for StringScalar {
+  fn of(value: String) -> Self {
     StringScalar {
       value: value.clone(),
     }
@@ -20,7 +20,7 @@ impl scalar::Scalar<String> for StringScalar {
 
 #[cfg(test)]
 mod test {
-  use crate::primitives::scalars::scalar::Scalar;
+  use crate::primitives::scalars::scalar::BaseScalar;
 
   extern crate proptest;
 
@@ -30,7 +30,7 @@ mod test {
   proptest! {
     #[test]
     fn test_of_and_value(s in ".*") {
-      assert_eq!(s, StringScalar::of(&s).to_value());
+      assert_eq!(s.clone(), StringScalar::of(s).to_value());
     }
   }
 }
