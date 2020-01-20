@@ -1,4 +1,4 @@
-use crate::primitives::scalars::scalar;
+use super::scalar;
 
 /// A scalar whose value is a string
 #[derive(Debug, Clone)]
@@ -13,7 +13,7 @@ impl scalar::Scalar<String> for StringScalar {
     }
   }
 
-  fn value(&self) -> String {
+  fn to_value(&self) -> String {
     self.value.clone()
   }
 }
@@ -30,7 +30,7 @@ mod test {
   proptest! {
     #[test]
     fn test_of_and_value(s in ".*") {
-      assert_eq!(s, StringScalar::of(&s).value());
+      assert_eq!(s, StringScalar::of(&s).to_value());
     }
   }
 }

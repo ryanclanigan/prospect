@@ -1,3 +1,5 @@
+use super::scalars::string_scalar::StringScalar;
+
 pub struct Sample {
-  pub fin: u32,
+  pub value: StringScalar,
 }
