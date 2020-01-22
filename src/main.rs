@@ -1,6 +1,10 @@
+extern crate chrono;
+
 mod operations;
 mod primitives;
 
+use chrono::prelude::*;
+use chrono::Duration;
 use operations::add::add_scalar::AddScalar;
 use primitives::sample::Sample;
 use primitives::scalars::float_scalar::FloatScalar;
@@ -10,20 +14,18 @@ use primitives::scalars::string_scalar::StringScalar;
 use primitives::signal::Signal;
 
 fn main() {
-  let f = Sample {
-    value: Scalar::String(StringScalar::of("Bing".to_string())),
-  };
   let b = Sample {
     value: Scalar::Float(FloatScalar::of(78f64)),
+    time: Utc::now(),
+  };
+  let c = Sample {
+    value: Scalar::Float(FloatScalar::of(79f64)),
+    time: b.time + Duration::seconds(60),
   };
 
-  let vs: Vec<Sample> = vec![f, b];
-  vs.into_iter().for_each(|x| beans(x.value));
+  let signal = Signal::numeric(Box::new(vec![b, c].into_iter()));
 }
 
-fn beans(scalar: Scalar) {
-  match scalar {
-    Scalar::String(s) => println!("Value in scalar: {}", s.to_value()),
-    Scalar::Float(f) => println!("Value in scalar: {}", f.to_value()),
-  }
+fn do_math(signal: Signal) {
+  let samples: Vec<Sample> = signal.samples.collect();
 }

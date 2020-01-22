@@ -2,17 +2,40 @@ use super::sample::Sample;
 use std::iter;
 
 pub struct Signal {
-  samples: Box<dyn Iterator<Item = Sample>>,
+  pub samples: Box<dyn Iterator<Item = Sample>>,
+  numeric: bool,
 }
 
 impl Signal {
-  fn empty() -> Self {
+  pub fn empty_numeric() -> Self {
     Signal {
       samples: Box::new(iter::empty()),
+      numeric: true,
     }
   }
 
-  fn getSamples(&self) -> &Box<dyn Iterator<Item = Sample>> {
-    return &self.samples;
+  pub fn empty_non_numeric() -> Self {
+    Signal {
+      samples: Box::new(iter::empty()),
+      numeric: false,
+    }
+  }
+
+  pub fn numeric(s: Box<dyn Iterator<Item = Sample>>) -> Self {
+    Signal {
+      samples: s,
+      numeric: true,
+    }
+  }
+
+  pub fn non_numeric(s: Box<dyn Iterator<Item = Sample>>) -> Self {
+    Signal {
+      samples: s,
+      numeric: false,
+    }
+  }
+
+  pub fn is_numeric(&self) -> bool {
+    return self.numeric;
   }
 }

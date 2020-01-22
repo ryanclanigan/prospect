@@ -1,6 +1,7 @@
 **/.vscode
 **/.lock
 **/target/
+**/proptest-regressions
 
 Cargo.lock
 

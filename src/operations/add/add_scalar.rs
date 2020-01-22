@@ -4,11 +4,11 @@ use crate::primitives::scalars::scalar::{BaseScalar, Scalar};
 use crate::primitives::scalars::string_scalar::StringScalar;
 use std::f64::NAN;
 
-pub struct AddScalar {
-  value: Scalar,
+pub struct AddScalar<'a> {
+  pub value: &'a Scalar,
 }
 
-impl BaseOperation<Scalar> for AddScalar {
+impl<'a> BaseOperation<Scalar> for AddScalar<'a> {
   fn apply(&self, scalar: &Scalar) -> Result<Scalar, &'static str> {
     match &self.value {
       Scalar::String(s1) => match scalar {
@@ -45,7 +45,7 @@ mod test {
       fn strings_append(string1 in ".*", string2 in ".*") {
         let sr1 = &string1;
         let s1 = AddScalar {
-          value: Scalar::String(StringScalar::of(string1.clone())),
+          value: &Scalar::String(StringScalar::of(string1.clone())),
         };
         let s2 = Scalar::String(StringScalar::of(string2.clone()));
         assert_eq!(
@@ -60,7 +60,7 @@ mod test {
       #[test]
       fn strings_and_float_error(string1 in ".*", f in prop::num::f64::ANY) {
         let s1 = AddScalar {
-          value: Scalar::String(StringScalar::of(string1)),
+          value: &Scalar::String(StringScalar::of(string1)),
         };
         let f1 = Scalar::Float(FloatScalar::of(f));
         assert_eq!("Mismatched types: String and Float",
@@ -75,7 +75,7 @@ mod test {
       fn floats_and_string_error(string1 in ".*", f in prop::num::f64::ANY) {
         let s1 = Scalar::String(StringScalar::of(string1));
         let f1 = AddScalar {
-          value: Scalar::Float(FloatScalar::of(f)),
+          value: &Scalar::Float(FloatScalar::of(f)),
         };
         assert_eq!("Mismatched types: Float and String",
           match f1.apply(&s1) {
@@ -88,7 +88,7 @@ mod test {
       #[test]
       fn floats_add(float1 in MIN..MAX/2f64, float2 in MIN..MAX/2f64) {
         let f1 = AddScalar {
-          value: Scalar::Float(FloatScalar::of(float1)),
+          value: &Scalar::Float(FloatScalar::of(float1)),
         };
         let f2 = Scalar::Float(FloatScalar::of(float2));
         assert_eq!(float1 + float2,
