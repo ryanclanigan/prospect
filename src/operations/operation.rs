@@ -1,3 +1,8 @@
 pub trait BaseOperation<T> {
-  fn apply(&self, value: &T) -> Result<T, &'static str>;
+    fn get_args(&self) -> &Box<[&T]>;
+    fn get_op(&self) -> Box<dyn Fn(&Box<[&T]>) -> Result<T, &'static str>>;
+
+    fn apply(&self) -> Result<T, &'static str> {
+        self.get_op()(self.get_args())
+    }
 }

@@ -3,34 +3,34 @@ use super::scalar;
 /// A scalar whose value is a string
 #[derive(Debug, Clone)]
 pub struct StringScalar {
-  value: String,
+    value: String,
 }
 
 impl scalar::BaseScalar<String> for StringScalar {
-  fn of(value: String) -> Self {
-    StringScalar {
-      value: value.clone(),
+    fn of(value: String) -> Self {
+        StringScalar {
+            value: value.clone(),
+        }
     }
-  }
 
-  fn to_value(&self) -> String {
-    self.value.clone()
-  }
+    fn to_value(&self) -> String {
+        self.value.clone()
+    }
 }
 
 #[cfg(test)]
 mod test {
-  use crate::primitives::scalars::scalar::BaseScalar;
+    use crate::primitives::scalars::scalar::BaseScalar;
 
-  extern crate proptest;
+    extern crate proptest;
 
-  use super::*;
-  use proptest::prelude::*;
+    use super::*;
+    use proptest::prelude::*;
 
-  proptest! {
-    #[test]
-    fn test_of_and_value(s in ".*") {
-      assert_eq!(s.clone(), StringScalar::of(s).to_value());
+    proptest! {
+      #[test]
+      fn test_of_and_value(s in ".*") {
+        assert_eq!(s.clone(), StringScalar::of(s).to_value());
+      }
     }
-  }
 }
