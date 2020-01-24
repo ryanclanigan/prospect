@@ -1,17 +1,18 @@
 use super::scalar;
+use super::F64::F64;
 
 /// A scalar whose value is a string
-#[derive(Debug, Clone)]
+#[derive(Copy, Debug, Clone, Eq, PartialEq)]
 pub struct FloatScalar {
-    value: f64,
+    value: F64,
 }
 
-impl scalar::BaseScalar<f64> for FloatScalar {
-    fn of(value: f64) -> Self {
+impl scalar::BaseScalar<F64> for FloatScalar {
+    fn of(value: F64) -> Self {
         FloatScalar { value }
     }
 
-    fn to_value(&self) -> f64 {
+    fn to_value(&self) -> F64 {
         self.value
     }
 }
@@ -28,10 +29,10 @@ mod test {
     #[test]
     fn test_of_and_value() {
         let mut rng = rand::thread_rng();
-
         for _ in 0..100 {
             let n: f64 = rng.gen_range(MIN, MAX);
-            assert_eq!(n, FloatScalar::of(n).to_value());
+            let real_n = F64::of(n);
+            assert_eq!(real_n, FloatScalar::of(real_n).to_value());
         }
     }
 }

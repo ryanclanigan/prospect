@@ -1,16 +1,14 @@
 use super::scalar;
 
 /// A scalar whose value is a string
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct StringScalar {
     value: String,
 }
 
 impl scalar::BaseScalar<String> for StringScalar {
     fn of(value: String) -> Self {
-        StringScalar {
-            value: value.clone(),
-        }
+        StringScalar { value }
     }
 
     fn to_value(&self) -> String {

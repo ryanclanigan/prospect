@@ -3,41 +3,27 @@ use crate::operations::operation::BaseOperation;
 use crate::primitives::sample::Sample;
 
 pub struct AddSample<'a> {
-    args: Box<[&'a Sample]>,
+    sample1: &'a Sample,
+    sample2: &'a Sample,
 }
 
 impl<'a> AddSample<'a> {
     pub fn of(sample1: &'a Sample, sample2: &'a Sample) -> Self {
-        AddSample {
-            args: Box::new([sample1, sample2]),
-        }
+        AddSample { sample1, sample2 }
     }
 }
 
 impl<'a> BaseOperation<Sample> for AddSample<'a> {
-    fn get_op(&self) -> Box<dyn Fn(&Box<[&Sample]>) -> Result<Sample, &'static str>> {
-        Box::new(|args: &Box<[&Sample]>| -> Result<Sample, &'static str> {
-            let sample1 = args[0];
-            let sample2 = args[1];
-            if sample1.time.eq(&sample2.time) == true {
-                let op = AddScalar::of(&sample1.value, &sample2.value);
-                let result = op.apply();
-                match result {
-                    Ok(s) => {
-                        return Ok(Sample {
-                            value: s,
-                            time: sample1.time,
-                        })
-                    }
-                    Err(e) => return Err(e),
-                }
+    fn apply(&mut self) -> Result<Sample, &'static str> {
+        if self.sample1.time.eq(&self.sample2.time) {
+            let mut op = AddScalar::of(&self.sample1.value, &self.sample2.value);
+            let result = op.apply();
+            match result {
+                Ok(s) => return Ok(Sample::of(s, self.sample1.time)),
+                Err(e) => return Err(e),
             }
-            Err("Sample times of two samples did not match")
-        })
-    }
-
-    fn get_args(&self) -> &Box<[&Sample]> {
-        &self.args
+        }
+        Err("Sample times of two samples did not match")
     }
 }
 
@@ -66,7 +52,7 @@ mod test {
             value: Scalar::String(StringScalar::of(string2.clone())),
             time: now
           };
-          let op = AddSample::of( &s1, &s2);
+          let mut op = AddSample::of( &s1, &s2);
           assert_eq!(
             format!("{}{}",string1,string2),
             match op.apply().unwrap().value {
@@ -88,7 +74,7 @@ mod test {
             value: Scalar::String(StringScalar::of(string2.clone())),
             time: later
           };
-          let op = AddSample::of(&s1, &s2);
+          let mut op = AddSample::of(&s1, &s2);
           assert_eq!(
             format!("Sample times of two samples did not match"),
             match op.apply() {
