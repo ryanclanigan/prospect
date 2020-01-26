@@ -29,8 +29,6 @@ impl<'a> BaseOperation<Sample> for AddSample<'a> {
 
 #[cfg(test)]
 mod test {
-
-    extern crate chrono;
     extern crate proptest;
 
     use super::*;

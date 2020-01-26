@@ -79,8 +79,6 @@ impl<'a> BaseOperation<Signal> for AddSignal<'a> {
 
 #[cfg(test)]
 mod test {
-
-    extern crate chrono;
     extern crate proptest;
 
     use super::*;

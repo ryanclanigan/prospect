@@ -1,12 +1,10 @@
-extern crate chrono;
-
 use super::scalars::scalar::Scalar;
 use chrono::prelude::*;
 
-#[derive(Clone, Eq, PartialEq)]
+#[derive(Clone, Eq, PartialEq, Debug)]
 pub struct Sample {
-    pub value: Scalar,
     pub time: DateTime<Utc>,
+    pub value: Scalar,
 }
 
 impl Sample {
@@ -31,8 +29,6 @@ impl Sample {
 
 #[cfg(test)]
 mod test {
-
-    extern crate chrono;
     extern crate proptest;
 
     use super::*;
