@@ -25,6 +25,13 @@ impl Sample {
     pub fn of(value: Scalar, time: DateTime<Utc>) -> Self {
         Sample { value, time }
     }
+
+    pub fn is_numeric(&self) -> bool {
+        match self.value {
+            Scalar::Float(_) => true,
+            Scalar::String(_) => false,
+        }
+    }
 }
 
 #[cfg(test)]
