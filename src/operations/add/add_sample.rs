@@ -29,8 +29,6 @@ impl<'a> BaseOperation<Sample> for AddSample<'a> {
 
 #[cfg(test)]
 mod test {
-    extern crate proptest;
-
     use super::*;
     use crate::primitives::scalars::scalar::*;
     use crate::primitives::scalars::string_scalar::StringScalar;

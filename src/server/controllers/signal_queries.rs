@@ -14,7 +14,7 @@ impl SignalQueries {
 
 #[get("/signal")]
 async fn get_signals() -> impl Responder {
-    HttpResponse::Ok().body("Hey leave")
+    HttpResponse::Ok().body("Bees")
 }
 
 #[post("/signal")]

@@ -78,8 +78,6 @@ impl TryFrom<&String> for F64 {
 
 #[cfg(test)]
 mod test {
-    extern crate proptest;
-
     use super::*;
     use proptest::prelude::*;
     use std::f64::MAX;

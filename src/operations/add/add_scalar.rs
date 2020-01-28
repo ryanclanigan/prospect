@@ -37,9 +37,6 @@ impl<'a> BaseOperation<Scalar> for AddScalar<'a> {
 
 #[cfg(test)]
 mod test {
-
-    extern crate proptest;
-
     use super::*;
     use crate::primitives::scalars::F64::*;
     use proptest::prelude::*;

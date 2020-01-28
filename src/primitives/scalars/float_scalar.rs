@@ -19,8 +19,6 @@ impl scalar::BaseScalar<F64> for FloatScalar {
 
 #[cfg(test)]
 mod test {
-    extern crate rand;
-
     use super::*;
     use crate::primitives::scalars::scalar::BaseScalar;
     use rand::Rng;

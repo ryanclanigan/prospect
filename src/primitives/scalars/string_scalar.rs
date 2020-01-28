@@ -18,11 +18,8 @@ impl scalar::BaseScalar<String> for StringScalar {
 
 #[cfg(test)]
 mod test {
-    use crate::primitives::scalars::scalar::BaseScalar;
-
-    extern crate proptest;
-
     use super::*;
+    use crate::primitives::scalars::scalar::BaseScalar;
     use proptest::prelude::*;
 
     proptest! {

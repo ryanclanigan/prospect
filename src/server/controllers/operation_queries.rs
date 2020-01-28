@@ -1,4 +1,6 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder, Scope};
+use crate::server::output::operations_responses::*;
+use actix_web::error::Result;
+use actix_web::{get, web, HttpResponse, Responder};
 
 pub struct OperationQueries;
 
@@ -10,7 +12,9 @@ impl OperationQueries {
 
 #[get("/operations")]
 async fn get_operations() -> impl Responder {
-    HttpResponse::Ok().body("F")
+    OperationsResponse {
+        operations: vec!["Add".to_string()],
+    }
 }
 
 #[get("/operations/{operation}")]
@@ -20,5 +24,5 @@ async fn do_operation() -> impl Responder {
 
 #[get("operations/{operation}/csv")]
 async fn do_operation_csv() -> impl Responder {
-    HttpResponse::Ok().body("P")
+    HttpResponse::Ok().body(Vec::new())
 }

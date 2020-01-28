@@ -79,8 +79,6 @@ impl<'a> BaseOperation<Signal> for AddSignal<'a> {
 
 #[cfg(test)]
 mod test {
-    extern crate proptest;
-
     use super::*;
     use crate::primitives::scalars::float_scalar::FloatScalar;
     use crate::primitives::scalars::scalar::*;
