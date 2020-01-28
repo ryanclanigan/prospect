@@ -1,23 +1,33 @@
 #[macro_use]
 extern crate anyhow;
+extern crate actix_rt;
+extern crate actix_web;
 extern crate chrono;
 extern crate csv;
+extern crate futures;
 extern crate serde;
+extern crate serde_json;
 
 mod operations;
 mod primitives;
-mod readers;
+mod server;
+mod storage_drivers;
 
-use chrono::prelude::*;
-use chrono::DateTime;
-use primitives::sample::Sample;
-use readers::signal_reader::SignalReader;
-use readers::signal_writer::SignalWriter;
+use actix_web::{get, App, HttpResponse, HttpServer, Responder, Scope};
 
-fn main() {
-    let r = SignalReader;
-    let mut s = r.read_signal(std::path::Path::new("g.csv"), 0, 1).unwrap();
-    let w = SignalWriter;
-    w.write_signal(&mut s, std::path::Path::new("h.csv"))
-        .unwrap();
+#[get("/")]
+async fn index() -> impl Responder {
+    HttpResponse::Ok().body("Server's up")
+}
+
+#[actix_rt::main]
+async fn main() -> std::io::Result<()> {
+    HttpServer::new(|| {
+        App::new()
+            .service(index)
+            .configure(server::controllers::register_controllers)
+    })
+    .bind("localhost:3000")?
+    .run()
+    .await
 }
