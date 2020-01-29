@@ -14,7 +14,9 @@ impl<'a> AddScalar<'a> {
     }
 }
 
-impl<'a> BaseOperation<Scalar> for AddScalar<'a> {
+impl<'a> BaseOperation for AddScalar<'a> {
+    type Primitive = Scalar;
+
     fn apply(&mut self) -> Result<Scalar, &'static str> {
         match self.scalar1 {
             Scalar::String(s1) => match self.scalar2 {

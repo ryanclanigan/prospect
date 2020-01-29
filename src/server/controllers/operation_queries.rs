@@ -1,4 +1,5 @@
 use crate::server::output::operations_responses::*;
+use crate::server::output::signal_responses::SignalResponse;
 use actix_web::error::Result;
 use actix_web::{get, web, HttpResponse, Responder};
 
@@ -18,11 +19,6 @@ async fn get_operations() -> impl Responder {
 }
 
 #[get("/operations/{operation}")]
-async fn do_operation() -> impl Responder {
-    HttpResponse::Ok().body("F")
-}
-
-#[get("operations/{operation}/csv")]
-async fn do_operation_csv() -> impl Responder {
-    HttpResponse::Ok().body(Vec::new())
+async fn do_operation(operation: web::Path<String>) -> Result<SignalResponse, OperationError> {
+    unimplemented!()
 }

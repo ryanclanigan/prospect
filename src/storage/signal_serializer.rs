@@ -49,6 +49,7 @@ impl SignalSerializer {
         )?)
     }
 
+    // TODO Make unwraps not be here
     pub async fn write_temp_from_bytes(&self, filename: &str, mut field: Field) -> String {
         let filepath = Path::new(Self::TEMP_FOLDER).join(filename);
         let mut f = fs::File::create(&filepath).unwrap();

@@ -14,7 +14,9 @@ impl<'a> AddSignal<'a> {
     }
 }
 
-impl<'a> BaseOperation<Signal> for AddSignal<'a> {
+impl<'a> BaseOperation for AddSignal<'a> {
+    type Primitive = Signal;
+
     fn apply(&mut self) -> Result<Signal, &'static str> {
         if self.signal1.is_numeric() != self.signal2.is_numeric() {
             return Err("Signals are of different types");

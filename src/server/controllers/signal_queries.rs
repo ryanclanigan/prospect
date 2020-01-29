@@ -75,6 +75,7 @@ async fn post_signal(mut payload: Multipart) -> Result<SignalResponse, SignalErr
 }
 
 #[post("/signal/{id}")]
+// TODO figure out visualizer
 async fn post_samples() -> impl Responder {
     HttpResponse::Ok().body("F")
 }

@@ -1,5 +1,7 @@
 #[macro_use]
 extern crate anyhow;
+#[macro_use]
+extern crate strum_macros;
 
 mod operations;
 mod primitives;

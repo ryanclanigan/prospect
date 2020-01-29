@@ -13,7 +13,9 @@ impl<'a> AddSample<'a> {
     }
 }
 
-impl<'a> BaseOperation<Sample> for AddSample<'a> {
+impl<'a> BaseOperation for AddSample<'a> {
+    type Primitive = Sample;
+
     fn apply(&mut self) -> Result<Sample, &'static str> {
         if self.sample1.time.eq(&self.sample2.time) {
             let mut op = AddScalar::of(&self.sample1.value, &self.sample2.value);

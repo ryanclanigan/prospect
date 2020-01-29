@@ -1,3 +1,5 @@
-pub trait BaseOperation<T> {
-    fn apply(&mut self) -> Result<T, &'static str>;
+pub trait BaseOperation {
+    type Primitive;
+
+    fn apply(&mut self) -> Result<Self::Primitive, &'static str>;
 }

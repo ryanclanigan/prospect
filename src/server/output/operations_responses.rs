@@ -1,6 +1,7 @@
-use actix_web::{Error, HttpRequest, HttpResponse, Responder};
+use actix_web::{error, Error, HttpRequest, HttpResponse, Responder};
 use futures::future::{ready, Ready};
 use serde::Serialize;
+use std::fmt;
 
 #[derive(Serialize)]
 pub struct OperationsResponse {
@@ -21,6 +22,15 @@ impl Responder for OperationsResponse {
     }
 }
 
-pub struct OperationCsvResponse {
-    pub result: String,
+#[derive(Debug)]
+pub struct OperationError {
+    pub message: String,
 }
+
+impl fmt::Display for OperationError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
+impl error::ResponseError for OperationError {}
