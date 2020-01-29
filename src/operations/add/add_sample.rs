@@ -1,6 +1,7 @@
 use super::add_scalar::*;
 use crate::operations::operation::BaseOperation;
 use crate::primitives::sample::Sample;
+use anyhow::Error;
 
 pub struct AddSample<'a> {
     sample1: &'a Sample,
@@ -16,7 +17,7 @@ impl<'a> AddSample<'a> {
 impl<'a> BaseOperation for AddSample<'a> {
     type Primitive = Sample;
 
-    fn apply(&mut self) -> Result<Sample, &'static str> {
+    fn apply(&mut self) -> Result<Sample, Error> {
         if self.sample1.time.eq(&self.sample2.time) {
             let mut op = AddScalar::of(&self.sample1.value, &self.sample2.value);
             let result = op.apply();
@@ -25,7 +26,7 @@ impl<'a> BaseOperation for AddSample<'a> {
                 Err(e) => return Err(e),
             }
         }
-        Err("Sample times of two samples did not match")
+        Err(anyhow!("Sample times of two samples did not match"))
     }
 }
 
@@ -76,7 +77,7 @@ mod test {
           assert_eq!(
             format!("Sample times of two samples did not match"),
             match op.apply() {
-              Err(e) => e,
+              Err(e) => e.to_string(),
               _ => unreachable!(),
             }
           );

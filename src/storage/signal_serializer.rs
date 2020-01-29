@@ -9,6 +9,7 @@ use std::fs;
 use std::io::Write;
 use std::path::{Path, PathBuf};
 
+#[derive(Copy, Clone)]
 pub struct SignalSerializer;
 
 impl SignalSerializer {
@@ -31,7 +32,7 @@ impl SignalSerializer {
         )?)
     }
 
-    pub fn read(&self, id: String) -> Result<Signal, Error> {
+    pub fn read(&self, id: &String) -> Result<Signal, Error> {
         let reader = SignalReader;
         Ok(reader.read_signal(
             &Path::new(Self::DATA_FOLDER).join(format!("{}{}", id, ".csv")),

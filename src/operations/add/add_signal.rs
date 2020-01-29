@@ -2,6 +2,7 @@ use super::add_sample::AddSample;
 use crate::operations::operation::BaseOperation;
 use crate::primitives::sample::Sample;
 use crate::primitives::signal::Signal;
+use anyhow::Error;
 
 pub struct AddSignal<'a> {
     signal1: &'a mut Signal,
@@ -17,9 +18,9 @@ impl<'a> AddSignal<'a> {
 impl<'a> BaseOperation for AddSignal<'a> {
     type Primitive = Signal;
 
-    fn apply(&mut self) -> Result<Signal, &'static str> {
+    fn apply(&mut self) -> Result<Signal, Error> {
         if self.signal1.is_numeric() != self.signal2.is_numeric() {
-            return Err("Signals are of different types");
+            return Err(anyhow!("Signals are of different types"));
         }
 
         let mut new_samples: Vec<Sample> = Vec::default();

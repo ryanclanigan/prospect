@@ -2,6 +2,7 @@ use crate::operations::operation::BaseOperation;
 use crate::primitives::scalars::float_scalar::*;
 use crate::primitives::scalars::scalar::{BaseScalar, Scalar};
 use crate::primitives::scalars::string_scalar::StringScalar;
+use anyhow::Error;
 
 pub struct AddScalar<'a> {
     scalar1: &'a Scalar,
@@ -17,7 +18,7 @@ impl<'a> AddScalar<'a> {
 impl<'a> BaseOperation for AddScalar<'a> {
     type Primitive = Scalar;
 
-    fn apply(&mut self) -> Result<Scalar, &'static str> {
+    fn apply(&mut self) -> Result<Scalar, Error> {
         match self.scalar1 {
             Scalar::String(s1) => match self.scalar2 {
                 Scalar::String(s2) => Ok(Scalar::String(StringScalar::of(format!(
@@ -25,13 +26,13 @@ impl<'a> BaseOperation for AddScalar<'a> {
                     s1.to_value(),
                     s2.to_value()
                 )))),
-                Scalar::Float(_) => Err("Mismatched types: String and Float"),
+                Scalar::Float(_) => Err(anyhow!("Mismatched types: String and Float")),
             },
             Scalar::Float(f1) => match self.scalar2 {
                 Scalar::Float(f2) => Ok(Scalar::Float(FloatScalar::of(
                     f1.to_value() + f2.to_value(),
                 ))),
-                Scalar::String(_) => Err("Mismatched types: Float and String"),
+                Scalar::String(_) => Err(anyhow!("Mismatched types: Float and String")),
             },
         }
     }
@@ -66,7 +67,7 @@ mod test {
           let mut op = AddScalar::of(&s1,&s2);
           assert_eq!("Mismatched types: String and Float",
             match op.apply() {
-              Err(e) => e,
+              Err(e) => e.to_string(),
               _ => unreachable!()
             }
           );
@@ -79,7 +80,7 @@ mod test {
           let mut op = AddScalar::of(&s1,&s2);
           assert_eq!("Mismatched types: Float and String",
             match op.apply() {
-              Err(e) => e,
+              Err(e) => e.to_string(),
               _ => unreachable!()
             }
           );

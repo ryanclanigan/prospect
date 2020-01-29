@@ -1,2 +1,2 @@
-pub mod operations_responses;
+pub mod operation_responses;
 pub mod signal_responses;
