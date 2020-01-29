@@ -17,7 +17,7 @@ impl SignalReader {
         value_column: usize,
     ) -> Result<Signal> {
         let mut reader = Reader::from_path(file)?;
-        let file_as_str = file.to_str().unwrap_or("File not found");
+        let file_as_str = file.to_str().unwrap_or("CSV file not found");
         let mut samples: Vec<Sample> = Vec::new();
 
         let mut iter = reader.records();
@@ -74,14 +74,12 @@ impl SignalReader {
     ) -> Result<String> {
         match record.get(column) {
             Some(t) => Ok(t.to_string()),
-            None => {
-                return Err(anyhow!(
-                    "{} column {} in csv file {} not found",
-                    error_prefix,
-                    column,
-                    file_as_str
-                ))
-            }
+            None => Err(anyhow!(
+                "{} column {} in csv file {} not found",
+                error_prefix,
+                column,
+                file_as_str
+            )),
         }
     }
 }

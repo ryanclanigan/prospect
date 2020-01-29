@@ -1,6 +1,11 @@
+use crate::primitives::item::Item;
 use crate::server::output::signal_responses::*;
 use crate::storage::signal_serializer::SignalSerializer;
+use actix_multipart::Multipart;
 use actix_web::{get, post, web, HttpResponse, Responder};
+use futures::StreamExt;
+use std::fs;
+use std::path::Path;
 
 pub struct SignalQueries;
 
@@ -21,7 +26,7 @@ async fn get_signals() -> Result<SignalsResponse, SignalError> {
         Ok(s) => s,
         Err(_) => {
             return Err(SignalError {
-                message: "Encountered issue while reading files",
+                message: "Encountered issue while reading files".to_string(),
             })
         }
     };
@@ -29,8 +34,43 @@ async fn get_signals() -> Result<SignalsResponse, SignalError> {
 }
 
 #[post("/signal")]
-async fn post_signal() -> impl Responder {
-    HttpResponse::Ok().body("Bees")
+// TODO: The uploaded file needs a new line, which is stupid. Find a way to document that
+// TODO: Use threadpool to not cause bad problems
+async fn post_signal(mut payload: Multipart) -> Result<SignalResponse, SignalError> {
+    let mut response = SignalResponse {
+        id_or_message: "No csv file found. Please upload a csv file.".to_string(),
+    };
+    while let Some(item) = payload.next().await {
+        let field = item.unwrap();
+        let content_type = field.content_disposition().unwrap();
+        let filename = content_type.get_filename().unwrap();
+        if !filename.ends_with(".csv") {
+            continue;
+        }
+        let serializer = SignalSerializer;
+        let filepath = serializer.write_temp_from_bytes(filename, field).await;
+
+        let mut temp_signal = match serializer.read_temp(filename.to_string()) {
+            Ok(s) => s,
+            Err(e) => {
+                return Err(SignalError {
+                    message: format!("{}", e),
+                })
+            }
+        };
+        match serializer.write(&mut temp_signal) {
+            Ok(_) => (),
+            Err(e) => {
+                return Err(SignalError {
+                    message: format!("{}", e),
+                })
+            }
+        };
+        fs::remove_file(Path::new(&filepath)).unwrap();
+        response.id_or_message = temp_signal.get_id().to_string();
+        return Ok(response);
+    }
+    Ok(response)
 }
 
 #[post("/signal/id")]

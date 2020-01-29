@@ -25,7 +25,7 @@ async fn fff() -> Result<fs::NamedFile, Error> {
 async fn main() -> std::io::Result<()> {
     match SignalSerializer::init_once() {
         Ok(_) => (),
-        Err(_) => panic!("Could not create data dir"),
+        Err(e) => panic!("Dir creation error: {}", e),
     };
     HttpServer::new(|| {
         App::new()

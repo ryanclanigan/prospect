@@ -2,6 +2,8 @@
 **/.lock
 **/target/
 **/proptest-regressions
+**/data/
+**/temp/
 
 Cargo.lock
 
