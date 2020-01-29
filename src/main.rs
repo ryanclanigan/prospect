@@ -8,8 +8,8 @@ mod storage;
 mod storage_drivers;
 
 use actix_files as fs;
-use actix_web::http::header::{ContentDisposition, DispositionType};
 use actix_web::{get, App, Error, HttpResponse, HttpServer, Responder};
+use storage::signal_serializer::SignalSerializer;
 
 #[get("/")]
 async fn index() -> impl Responder {
@@ -23,6 +23,10 @@ async fn fff() -> Result<fs::NamedFile, Error> {
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
+    match SignalSerializer::init_once() {
+        Ok(_) => (),
+        Err(_) => panic!("Could not create data dir"),
+    };
     HttpServer::new(|| {
         App::new()
             .service(index)

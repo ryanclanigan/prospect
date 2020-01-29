@@ -1,4 +1,6 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer, Responder, Scope};
+use crate::server::output::signal_responses::*;
+use crate::storage::signal_serializer::SignalSerializer;
+use actix_web::{get, post, web, HttpResponse, Responder};
 
 pub struct SignalQueries;
 
@@ -13,8 +15,17 @@ impl SignalQueries {
 }
 
 #[get("/signal")]
-async fn get_signals() -> impl Responder {
-    HttpResponse::Ok().body("Bees")
+async fn get_signals() -> Result<SignalsResponse, SignalError> {
+    let serializer = SignalSerializer::new();
+    let signals = match serializer.get_all_signal_ids() {
+        Ok(s) => s,
+        Err(_) => {
+            return Err(SignalError {
+                message: "Encountered issue while reading files",
+            })
+        }
+    };
+    Ok(SignalsResponse { signals })
 }
 
 #[post("/signal")]

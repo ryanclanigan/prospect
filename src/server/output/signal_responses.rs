@@ -1,10 +1,11 @@
-use actix_web::{Error, HttpRequest, HttpResponse, Responder};
+use actix_web::{error, Error, HttpRequest, HttpResponse, Responder, Result};
 use futures::future::{ready, Ready};
 use serde::Serialize;
+use std::fmt;
 
 #[derive(Serialize)]
 pub struct SignalsResponse {
-    pub operations: Vec<String>,
+    pub signals: Vec<String>,
 }
 
 impl Responder for SignalsResponse {
@@ -20,3 +21,16 @@ impl Responder for SignalsResponse {
             .body(body)))
     }
 }
+
+#[derive(Debug)]
+pub struct SignalError {
+    pub message: &'static str,
+}
+
+impl fmt::Display for SignalError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
+impl error::ResponseError for SignalError {}
