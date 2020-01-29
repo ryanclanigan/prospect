@@ -1,6 +1,7 @@
 use crate::primitives::item::Item;
 use crate::server::output::signal_responses::*;
 use crate::storage::signal_serializer::SignalSerializer;
+use actix_files;
 use actix_multipart::Multipart;
 use actix_web::{get, post, web, HttpResponse, Responder};
 use futures::StreamExt;
@@ -13,9 +14,9 @@ impl SignalQueries {
     pub fn config(config: &mut web::ServiceConfig) {
         config
             .service(get_signals)
+            .service(get_signal_csv)
             .service(post_signal)
-            .service(post_samples)
-            .service(get_samples);
+            .service(post_samples);
     }
 }
 
@@ -73,12 +74,18 @@ async fn post_signal(mut payload: Multipart) -> Result<SignalResponse, SignalErr
     Ok(response)
 }
 
-#[post("/signal/id")]
+#[post("/signal/{id}")]
 async fn post_samples() -> impl Responder {
     HttpResponse::Ok().body("F")
 }
 
-#[get("/signal/{id}/samples")]
-async fn get_samples() -> impl Responder {
-    HttpResponse::Ok().body("G")
+#[get("/signal/{id}/csv")]
+async fn get_signal_csv(id: web::Path<String>) -> Result<actix_files::NamedFile, SignalError> {
+    let serializer = SignalSerializer;
+    match serializer.get_raw_file(id.to_string()) {
+        Ok(f) => Ok(actix_files::NamedFile::open(f).unwrap()),
+        Err(e) => Err(SignalError {
+            message: e.to_string(),
+        }),
+    }
 }

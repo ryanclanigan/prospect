@@ -7,7 +7,7 @@ use anyhow::Error;
 use futures::stream::StreamExt;
 use std::fs;
 use std::io::Write;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub struct SignalSerializer;
 
@@ -83,5 +83,13 @@ impl SignalSerializer {
             fs::create_dir(temp_dir)?;
         }
         Ok(())
+    }
+
+    pub fn get_raw_file(&self, id: String) -> Result<PathBuf, Error> {
+        let file = Path::new(Self::DATA_FOLDER).join(format!("{}{}", id, ".csv"));
+        match file.exists() {
+            true => Ok(file),
+            false => Err(anyhow!("No file with that ID")),
+        }
     }
 }
