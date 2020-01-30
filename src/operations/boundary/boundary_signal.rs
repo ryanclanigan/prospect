@@ -90,12 +90,6 @@ mod test {
             ];
             let mut signal1 = Signal::of(samples1.clone(), false);
             let mut result = BoundarySignal::of(&mut signal1).apply().unwrap();
-            for f in &expected_samples {
-                println!("{}", f.time);
-            }
-            for f in result.get_samples() {
-                println!("{}", f.time);
-            }
             assert!(expected_samples == *result.get_samples());
         }
     }

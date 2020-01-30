@@ -1,31 +1,29 @@
+use ordered_float::*;
+use std::cmp::Ordering;
 use std::convert::TryFrom;
 use std::fmt;
 use std::ops;
 
 #[derive(Copy, Debug, Clone)]
 pub struct F64 {
-    value: f64,
+    value: OrderedFloat<f64>,
 }
 
 impl F64 {
     pub fn of(value: f64) -> Self {
-        F64 { value }
+        F64 {
+            value: OrderedFloat::from(value),
+        }
     }
 
     pub fn to_value(self) -> f64 {
-        self.value
+        self.value.into_inner()
     }
 }
 
 impl PartialEq for F64 {
     fn eq(&self, other: &Self) -> bool {
-        if self.value.is_nan() || other.value.is_nan() {
-            return false;
-        }
-        if self.value == other.value {
-            return true;
-        }
-        false
+        self.value == other.value
     }
 }
 
@@ -41,7 +39,7 @@ impl ops::Add<F64> for F64 {
         if _rhs.to_value().is_nan() {
             return F64::of(std::f64::NAN);
         }
-        F64::of(self.value + _rhs.to_value())
+        F64::of(self.value.into_inner() + _rhs.value.into_inner())
     }
 }
 
@@ -55,7 +53,19 @@ impl ops::Sub for F64 {
         if _rhs.to_value().is_nan() {
             return F64::of(std::f64::NAN);
         }
-        F64::of(self.value - _rhs.to_value())
+        F64::of(self.value.into_inner() - _rhs.value.into_inner())
+    }
+}
+
+impl Ord for F64 {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.value.cmp(&other.value)
+    }
+}
+
+impl PartialOrd for F64 {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 
@@ -90,6 +100,16 @@ mod test {
         assert_eq!(float1 - float2, (f1 - f2).to_value());
         assert_eq!(float1 + float2, (f1 + f2).to_value());
         assert_eq!(float2 - float1, (f2 - f1).to_value());
+      }
+
+      #[test]
+      fn float(float1 in 0f64..MAX/2f64, float2 in MAX/2f64..MAX) {
+            let f1 = F64::of(float1);
+            let f2 = F64::of(float2);
+            assert!(f1 < f2);
+            assert!(f2 > f1);
+            assert_eq!(f1, f1);
+            assert_eq!(f2, f2);
       }
     }
 }
