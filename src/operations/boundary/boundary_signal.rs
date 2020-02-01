@@ -25,13 +25,13 @@ impl<'a> BaseOperation for BoundarySignal<'a> {
         let samples = self.signal.get_samples();
         let duration;
         if samples.len() == 1 {
-            duration = Duration::hours(1);
+            duration = Duration::seconds(1);
         } else {
             duration = samples[1].time.signed_duration_since(samples[0].time);
         }
 
         let value = match samples[0].value {
-            Scalar::Float(_) => Scalar::Float(FloatScalar::of(F64::of(std::f64::MIN))),
+            Scalar::Float(_) => Scalar::Float(FloatScalar::of(F64::of(0f64))),
             Scalar::String(_) => Scalar::String(StringScalar::of("".to_string())),
         };
 
@@ -61,8 +61,8 @@ mod test {
         #[test]
         fn one_sample_string(string1 in ".*") {
           let now = Utc::now();
-          let early = now - Duration::hours(1);
-          let later = now + Duration::hours(1);
+          let early = now - Duration::seconds(1);
+          let later = now + Duration::seconds(1);
           let s1 = Sample::of(Scalar::String(StringScalar::of(string1.clone())), now);
           let samples1 = vec![s1.clone()];
           let expected_samples = vec![Sample::of(Scalar::String(StringScalar::of("".to_string())), early),
@@ -83,10 +83,10 @@ mod test {
             let s1 = Sample::of(Scalar::Float(FloatScalar::of(F64::of(float1))), now);
             let s2 = Sample::of(Scalar::Float(FloatScalar::of(F64::of(float2))), later);
             let samples1 = vec![s1.clone(), s2.clone()];
-            let expected_samples = vec![Sample::of(Scalar::Float(FloatScalar::of(F64::of(std::f64::MIN))), early),
+            let expected_samples = vec![Sample::of(Scalar::Float(FloatScalar::of(F64::of(0f64))), early),
               s1.clone(),
               s2.clone(),
-              Sample::of(Scalar::Float(FloatScalar::of(F64::of(std::f64::MIN))), laterer)
+              Sample::of(Scalar::Float(FloatScalar::of(F64::of(0f64))), laterer)
             ];
             let mut signal1 = Signal::of(samples1.clone(), false);
             let mut result = BoundarySignal::of(&mut signal1).apply().unwrap();

@@ -18,7 +18,7 @@ actix-multipart = "0.2.0"
 serde_json = "1.0.45"
 futures = "0.3.1"
 uuid = { version = "0.8", features = ["serde", "v4"] }
-plotlib = "0.4.0"
+plotters = "0.2.12"
 ordered-float = "1.0.2"
 
 [dev-dependencies]
