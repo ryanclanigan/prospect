@@ -1,11 +1,11 @@
 #[macro_use]
 extern crate anyhow;
 
+mod drivers;
 mod operations;
 mod primitives;
 mod server;
 mod storage;
-mod storage_drivers;
 
 use actix_web::middleware::Logger;
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
