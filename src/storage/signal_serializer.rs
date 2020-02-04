@@ -20,7 +20,7 @@ impl SignalSerializer {
         SignalSerializer
     }
 
-    pub fn write(&self, signal: &mut Signal) -> Result<(), Error> {
+    pub fn write(self, signal: &mut Signal) -> Result<(), Error> {
         let writer = SignalWriter;
         Ok(writer.write_signal(
             signal,
@@ -32,7 +32,7 @@ impl SignalSerializer {
         )?)
     }
 
-    pub fn read(&self, id: &String) -> Result<Signal, Error> {
+    pub fn read(self, id: &str) -> Result<Signal, Error> {
         let reader = SignalReader;
         Ok(reader.read_signal(
             &Path::new(Self::DATA_FOLDER).join(format!("{}{}", id, ".csv")),
@@ -41,27 +41,33 @@ impl SignalSerializer {
         )?)
     }
 
-    pub fn read_temp(&self, name: String) -> Result<Signal, Error> {
+    pub fn read_temp(self, name: String) -> Result<Signal, Error> {
         let reader = SignalReader;
-        Ok(reader.read_signal(
-            &Path::new(Self::TEMP_FOLDER).join(format!("{}", name)),
-            0,
-            1,
-        )?)
+        Ok(reader.read_signal(&Path::new(Self::TEMP_FOLDER).join(name), 0, 1)?)
     }
 
     // TODO Make unwraps not be here
-    pub async fn write_temp_from_bytes(&self, filename: &str, mut field: Field) -> String {
+    pub async fn write_temp_from_bytes(
+        self,
+        filename: &str,
+        mut field: Field,
+    ) -> Result<String, Error> {
         let filepath = Path::new(Self::TEMP_FOLDER).join(filename);
-        let mut f = fs::File::create(&filepath).unwrap();
+        let mut f = fs::File::create(&filepath)?;
         while let Some(chunk) = field.next().await {
-            let data = chunk.unwrap();
-            f.write_all(&data).unwrap();
+            let data = match chunk {
+                Ok(d) => d,
+                Err(e) => return Err(anyhow!(e.to_string())),
+            };
+            f.write_all(&data)?;
         }
-        filepath.to_str().unwrap().to_string()
+        match filepath.to_str() {
+            Some(s) => Ok(s.to_string()),
+            None => Err(anyhow!("Could not find file after writing")),
+        }
     }
 
-    pub fn get_all_signal_ids(&self) -> Result<Vec<String>, Error> {
+    pub fn get_all_signal_ids(self) -> Result<Vec<String>, Error> {
         let paths = fs::read_dir(Self::DATA_FOLDER)?;
 
         let mut files: Vec<String> = Vec::new();
@@ -87,11 +93,12 @@ impl SignalSerializer {
         Ok(())
     }
 
-    pub fn get_raw_file(&self, id: String) -> Result<PathBuf, Error> {
+    pub fn get_raw_file(self, id: String) -> Result<PathBuf, Error> {
         let file = Path::new(Self::DATA_FOLDER).join(format!("{}{}", id, ".csv"));
-        match file.exists() {
-            true => Ok(file),
-            false => Err(anyhow!("No file with that ID")),
+        if file.exists() {
+            Ok(file)
+        } else {
+            Err(anyhow!("No file with that ID"))
         }
     }
 }

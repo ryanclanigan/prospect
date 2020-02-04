@@ -23,12 +23,11 @@ impl<'a> BaseOperation for BoundarySignal<'a> {
 
     fn apply(&mut self) -> Result<Signal, Error> {
         let samples = self.signal.get_samples();
-        let duration;
-        if samples.len() == 1 {
-            duration = Duration::seconds(1);
+        let duration = if samples.len() == 1 {
+            Duration::seconds(1)
         } else {
-            duration = samples[1].time.signed_duration_since(samples[0].time);
-        }
+            samples[1].time.signed_duration_since(samples[0].time)
+        };
 
         let value = match samples[0].value {
             Scalar::Float(_) => Scalar::Float(FloatScalar::of(F64::of(0f64))),

@@ -7,7 +7,9 @@ mod server;
 mod storage;
 mod storage_drivers;
 
+use actix_web::middleware::Logger;
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+use env_logger;
 use storage::signal_serializer::SignalSerializer;
 
 #[get("/")]
@@ -21,8 +23,13 @@ async fn main() -> std::io::Result<()> {
         Ok(_) => (),
         Err(e) => panic!("Dir creation error: {}", e),
     };
+
+    std::env::set_var("RUST_LOG", "actix_web=info");
+    env_logger::init();
     HttpServer::new(|| {
         App::new()
+            .wrap(Logger::default())
+            .wrap(Logger::new("%a %{User-Agent}i"))
             .service(index)
             .configure(server::controllers::register_controllers)
     })

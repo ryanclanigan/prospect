@@ -38,21 +38,38 @@ async fn get_signals() -> Result<SignalsResponse, SignalError> {
 }
 
 #[post("/signal")]
-// TODO: The uploaded file needs a new line, which is stupid. Find a way to document that
-// TODO: Use threadpool to not cause bad problems
+// TODO: The uploaded file needs a new line, which is stupid. Find a way to document that. Do it in README?
 async fn post_signal(mut payload: Multipart) -> Result<SignalResponse, SignalError> {
     let mut response = SignalResponse {
         id_or_message: "No csv file found. Please upload a csv file.".to_string(),
     };
     while let Some(item) = payload.next().await {
-        let field = item.unwrap();
-        let content_type = field.content_disposition().unwrap();
-        let filename = content_type.get_filename().unwrap();
+        let field = match item {
+            Ok(f) => f,
+            Err(e) => {
+                return Err(wrap_error_in_signal_error(format!(
+                    "Error trying to unwrap payload. Source error: {}",
+                    e.to_string()
+                )))
+            }
+        };
+        let content_type = match field.content_disposition() {
+            Some(ct) => ct,
+            None => return Err(wrap_error_in_signal_error(
+                "No content dispostion found in payload. Please make sure you're sending a csv file".to_string())),
+        };
+        let filename = match content_type.get_filename() {
+            Some(f) => f,
+            None => return Err(wrap_error_in_signal_error("No file name found in the content type. Please make sure you're sending a csv file".to_string()))
+        };
         if !filename.ends_with(".csv") {
             continue;
         }
         let serializer = SignalSerializer;
-        let filepath = serializer.write_temp_from_bytes(filename, field).await;
+        let filepath = match serializer.write_temp_from_bytes(filename, field).await {
+            Ok(f) => f,
+            Err(e) => return Err(wrap_error_in_signal_error(e.to_string())),
+        };
 
         let mut temp_signal = match serializer.read_temp(filename.to_string()) {
             Ok(s) => s,
@@ -62,7 +79,9 @@ async fn post_signal(mut payload: Multipart) -> Result<SignalResponse, SignalErr
             Ok(_) => (),
             Err(e) => return Err(wrap_error_in_signal_error(e.to_string())),
         };
-        fs::remove_file(Path::new(&filepath)).unwrap();
+        if let Err(e) = fs::remove_file(Path::new(&filepath)) {
+            return Err(wrap_error_in_signal_error(e.to_string()));
+        };
         response.id_or_message = temp_signal.get_id().to_string();
         return Ok(response);
     }
@@ -122,7 +141,6 @@ async fn get_signal_image(id: web::Path<String>) -> Result<actix_files::NamedFil
 
     let filepath = format!("temp/{}.png", id_as_string);
 
-    let data = convert_samples_to_plot_vec(signal.get_samples());
     let root = BitMapBackend::new(&filepath, (1600, 900)).into_drawing_area();
     match root.fill(&WHITE) {
         Ok(_) => (),
@@ -167,7 +185,10 @@ async fn get_signal_image(id: web::Path<String>) -> Result<actix_files::NamedFil
         Err(e) => return Err(wrap_error_in_signal_error(e.to_string())),
     };
 
-    Ok(actix_files::NamedFile::open(&filepath).unwrap())
+    match actix_files::NamedFile::open(&filepath) {
+        Ok(f) => Ok(f),
+        Err(e) => Err(wrap_error_in_signal_error(e.to_string())),
+    }
 }
 
 #[get("/signal/{id}/csv")]
@@ -185,7 +206,7 @@ fn wrap_error_in_signal_error(e: String) -> SignalError {
     SignalError { message: e }
 }
 
-fn convert_samples_to_plot_vec(samples: &Vec<Sample>) -> Vec<(DateTime<Utc>, f64)> {
+fn convert_samples_to_plot_vec(samples: &[Sample]) -> Vec<(DateTime<Utc>, f64)> {
     let mut result: Vec<(DateTime<Utc>, f64)> = Vec::new();
 
     for sample in samples {

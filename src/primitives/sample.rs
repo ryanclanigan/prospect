@@ -12,16 +12,10 @@ impl Sample {
         self.time < other.time
     }
 
-    #[allow(dead_code)]
-    pub fn is_keyed_at(&self, other: &Sample) -> bool {
-        self.time == other.time
-    }
-
     pub fn is_keyed_after(&self, other: &Sample) -> bool {
         self.time > other.time
     }
 
-    #[allow(dead_code)]
     pub fn of(value: Scalar, time: DateTime<Utc>) -> Self {
         Sample { value, time }
     }
@@ -37,8 +31,10 @@ impl Sample {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::primitives::scalars::float_scalar::FloatScalar;
     use crate::primitives::scalars::scalar::*;
     use crate::primitives::scalars::string_scalar::StringScalar;
+    use crate::primitives::scalars::F64::F64;
     use chrono::Duration;
     use proptest::prelude::*;
 
@@ -68,23 +64,18 @@ mod test {
         }
 
         #[test]
-        fn is_keyed_at(string1 in ".*", string2 in ".*", days in 1i64..1500i64) {
+        fn is_numeric(s in ".*", f in 1f64..1500f64) {
           let now = Utc::now();
-          let later = now + Duration::days(days);
           let s1 = Sample{
-            value: Scalar::String(StringScalar::of(string1.clone())),
+            value: Scalar::String(StringScalar::of(s.clone())),
             time: now
           };
           let s2 = Sample{
-            value: Scalar::String(StringScalar::of(string2.clone())),
-            time: later
-          };
-          let s3 = Sample{
-            value: Scalar::String(StringScalar::of(string2.clone())),
+            value: Scalar::Float(FloatScalar::of(F64::of(f))),
             time: now
           };
-          assert_eq!(s1.is_keyed_at(&s3), true);
-          assert_eq!(s1.is_keyed_at(&s2), false);
+          assert!(!s1.is_numeric());
+          assert!(s2.is_numeric());
         }
     }
 }

@@ -23,9 +23,8 @@ impl<'a> BaseOperation for ExtremesSignal<'a> {
     type Primitive = Signal;
 
     fn apply(&mut self) -> Result<Signal, Error> {
-        match self.signal.is_numeric() {
-            true => (),
-            false => return Err(anyhow!("Non-numeric signals do not have extremes")),
+        if !self.signal.is_numeric() {
+            return Err(anyhow!("Non-numeric signals do not have extremes"));
         }
 
         let samples = self.signal.get_samples();

@@ -32,13 +32,10 @@ async fn do_operation(input: web::Json<SignalInputs>) -> Result<SignalResponse, 
         }
     };
 
-    match serializer.write(&mut result) {
-        Err(e) => {
-            return Err(OperationError {
-                message: e.to_string(),
-            })
-        }
-        Ok(_) => (),
+    if let Err(e) = serializer.write(&mut result) {
+        return Err(OperationError {
+            message: e.to_string(),
+        });
     };
     Ok(SignalResponse {
         id_or_message: result.get_id().to_string(),
@@ -46,7 +43,7 @@ async fn do_operation(input: web::Json<SignalInputs>) -> Result<SignalResponse, 
 }
 
 fn get_signal_input(
-    signal_id: &String,
+    signal_id: &str,
     serializer: SignalSerializer,
 ) -> Result<Signal, OperationError> {
     match serializer.read(signal_id) {
