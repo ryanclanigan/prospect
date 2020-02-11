@@ -1,13 +1,10 @@
 use crate::drivers::visualization::graph_generator::GraphGenerator;
 use crate::primitives::item::Item;
-use crate::primitives::sample::Sample;
-use crate::primitives::scalars::scalar::{BaseScalar, Scalar};
 use crate::server::output::signal_responses::*;
 use crate::storage::signal_serializer::SignalSerializer;
 use actix_files;
 use actix_multipart::Multipart;
 use actix_web::{get, post, web};
-use chrono::prelude::*;
 use futures::StreamExt;
 use std::fs;
 use std::path::Path;

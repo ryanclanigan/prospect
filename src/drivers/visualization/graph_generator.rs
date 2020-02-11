@@ -11,12 +11,7 @@ use plotters::prelude::*;
 pub struct GraphGenerator;
 
 impl GraphGenerator {
-    pub fn draw_signal(
-        self,
-        mut signal: Signal,
-        filepath: &String,
-        id: String,
-    ) -> Result<(), Error> {
+    pub fn draw_signal(self, mut signal: Signal, filepath: &str, id: String) -> Result<(), Error> {
         // Have to use an expanded range for the x-axis (time), so that we display everything appropriately
         let mut boundary_signal = BoundarySignal::of(&mut signal).apply()?;
         let boundary_samples = boundary_signal.get_samples();
@@ -61,6 +56,11 @@ impl GraphGenerator {
             .draw()?;
         let plot_values = convert_samples_to_plot_vec(signal.get_samples());
         chart.draw_series(LineSeries::new(plot_values.clone(), &RED))?;
+
+        // This is needed because of a weird interaction with closure semantics where the rust compiler can figure out
+        // the return type of the below closure only if the return keyword is there. The trait that the closure needs to
+        // return are only accessible internally in the plotters library, leading to this weird situation
+        #[allow(clippy::needless_return)]
         chart.draw_series(PointSeries::of_element(
             plot_values,
             5, // Size of the circle
