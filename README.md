@@ -31,9 +31,7 @@ The API isn't complicated, but I couldn't find a good way to have actix auto gen
 
 ```json
 {
-    inputs: [
-        (ID's here separated by comma)
-    ]
+  "inputs": ["(ID's here separated by comma)"]
 }
 ```
 
