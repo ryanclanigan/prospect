@@ -45,6 +45,7 @@ The API isn't complicated, but I couldn't find a good way to have actix auto gen
 
 ```
 time, value
+(Various datums here)
 ```
 
 (I recommend using postman. It makes your life easier)
