@@ -48,7 +48,7 @@ time, value
 (Various datums here)
 ```
 
-The time values should be a UTC ISO8601 timestamp of the form 2020-04-05T17:18:56Z. I specifically only tested to guarantee behavior on this kind of timestamp because timezones are hard and this simplifies the process. (I recommend using postman. It makes your life easier)
+The time values should be a UTC ISO8601 timestamp of the form 2020-04-05T17:18:56Z. I specifically only tested to guarantee behavior on this kind of timestamp because time zones are hard and this simplifies the process. (I recommend using postman. It makes your life easier)
 
 **GET /signal/{ID}/csv** - Returns the signal as a csv file, which is actually immediately uploadable to the server.
 
