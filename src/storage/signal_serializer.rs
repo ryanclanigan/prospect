@@ -46,7 +46,6 @@ impl SignalSerializer {
         Ok(reader.read_signal(&Path::new(Self::TEMP_FOLDER).join(name), 0, 1)?)
     }
 
-    // TODO Make unwraps not be here
     pub async fn write_temp_from_bytes(
         self,
         filename: &str,

@@ -91,3 +91,27 @@ fn convert_samples_to_plot_vec(samples: &[Sample]) -> Vec<(DateTime<Utc>, f64)> 
     result.remove(0);
     result
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::primitives::scalars::float_scalar::FloatScalar;
+    use crate::primitives::scalars::scalar::BaseScalar;
+    use crate::primitives::scalars::F64::F64;
+
+    #[test]
+    fn test_convert_sample_to_plot_vec() {
+        let now = Utc::now();
+        let samples = vec![
+            Sample::of(Scalar::Float(FloatScalar::of(F64::of(1f64))), Utc::now()),
+            Sample::of(Scalar::Float(FloatScalar::of(F64::of(2f64))), now),
+            Sample::of(Scalar::Float(FloatScalar::of(F64::of(3f64))), Utc::now()),
+        ];
+
+        let result = convert_samples_to_plot_vec(&samples);
+
+        assert_eq!(result.len(), 1);
+        assert_eq!(result[0].0, now);
+        assert_eq!(result[0].1, 2f64);
+    }
+}

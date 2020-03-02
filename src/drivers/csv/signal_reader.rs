@@ -17,7 +17,10 @@ impl SignalReader {
         value_column: usize,
     ) -> Result<Signal> {
         let mut reader = Reader::from_path(file)?;
-        let file_as_str = file.to_str().unwrap_or("CSV file not found");
+        let file_as_str = match file.to_str() {
+            Some(f) => f,
+            None => return Err(anyhow!("CSV file not found")),
+        };
         let mut samples: Vec<Sample> = Vec::new();
 
         let mut iter = reader.records();
@@ -75,11 +78,56 @@ impl SignalReader {
         match record.get(column) {
             Some(t) => Ok(t.to_string()),
             None => Err(anyhow!(
-                "{} column {} in csv file {} not found",
+                "{}. column {} in csv file {} not found",
                 error_prefix,
                 column,
                 file_as_str
             )),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::primitives::scalars::float_scalar::FloatScalar;
+    use crate::primitives::scalars::scalar::BaseScalar;
+    use crate::primitives::scalars::string_scalar::StringScalar;
+    use crate::primitives::scalars::F64::F64;
+    use chrono::prelude::*;
+
+    #[test]
+    fn test_check_record_to_sample_numeric() {
+        let numeric_sample = Sample::of(Scalar::Float(FloatScalar::of(F64::of(1f64))), Utc::now());
+        let string_sample = Sample::of(
+            Scalar::String(StringScalar::of("Fish".to_string())),
+            Utc::now(),
+        );
+
+        let numeric_sample_record = SampleRecord::from_sample(&numeric_sample);
+        let string_sample_record = SampleRecord::from_sample(&string_sample);
+
+        let reader = SignalReader;
+
+        assert_eq!(
+            numeric_sample.clone(),
+            reader
+                .check_record_to_sample_numeric(numeric_sample_record.clone(), true)
+                .unwrap()
+        );
+        match reader.check_record_to_sample_numeric(numeric_sample_record.clone(), false) {
+            Err(e) => assert_eq!("Not all samples in file are of same type", e.to_string()),
+            _ => unreachable!(),
+        };
+        assert_eq!(
+            string_sample.clone(),
+            reader
+                .check_record_to_sample_numeric(string_sample_record.clone(), false)
+                .unwrap()
+        );
+        match reader.check_record_to_sample_numeric(string_sample_record, true) {
+            Err(e) => assert_eq!("Not all samples in file are of same type", e.to_string()),
+            _ => unreachable!(),
+        };
     }
 }

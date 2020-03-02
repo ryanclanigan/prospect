@@ -103,7 +103,7 @@ mod test {
       }
 
       #[test]
-      fn float(float1 in 0f64..MAX/2f64, float2 in MAX/2f64..MAX) {
+      fn test_compares(float1 in 0f64..MAX/2f64, float2 in MAX/2f64..MAX) {
             let f1 = F64::of(float1);
             let f2 = F64::of(float2);
             assert!(f1 < f2);
@@ -111,5 +111,19 @@ mod test {
             assert_eq!(f1, f1);
             assert_eq!(f2, f2);
       }
+    }
+
+    #[test]
+    fn test_try_from() {
+        let number_as_str = "4";
+        let words = "Some stuff";
+        match F64::try_from(&number_as_str.to_string()) {
+            Ok(f) => assert_eq!(f, F64::of(4f64)),
+            _ => unreachable!(),
+        };
+        match F64::try_from(&words.to_owned()) {
+            Err(e) => assert_eq!(e.to_string(), "Could not convert string to F64"),
+            _ => unreachable!(),
+        }
     }
 }
