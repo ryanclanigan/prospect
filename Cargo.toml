@@ -21,6 +21,8 @@ uuid = { version = "0.8", features = ["serde", "v4"] }
 plotters = "0.2.12"
 ordered-float = "1.0.2"
 env_logger = "0.7.1"
+# one of the dependencies doesn't like building on windows. This is a workaround for now.
+quote = "=1.0.2"
 
 
 [dev-dependencies]
